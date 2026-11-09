@@ -1,0 +1,21 @@
+
+features
+
++-*/ modes
+equations
+generation
+logging scores; improvement
+fast to use UI
+colored text
+
+architecture
+
+gen folder
++,-,*,/ classes
+solver folder
+logging folder
+log to sqlite
+
+todo
+
+research how to gen equations
