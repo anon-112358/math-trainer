@@ -18,4 +18,7 @@ log to sqlite
 
 todo
 
-research how to gen equations
+research how to gen equations gooder. Maybe pull from some database of solved equations step by step?
+in additionPractice:
+    code L/R input
+    make it so the text is green for a second after you get it right
