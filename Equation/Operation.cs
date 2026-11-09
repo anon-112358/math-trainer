@@ -2,20 +2,32 @@ using System.Numerics;
 
 namespace math_trainer.Equation
 {
-    public record struct Operation<T>(T A, Operator Op, T B)
+    public record struct Operation<T>(T A, Operator Op, T B) : INode
         where T : INumber<T>
     {
         public readonly T Solve()
         {
-            T? val =
+            T val =
                 Op == Operator.Plus ? A + B
                 : Op == Operator.Minus ? A - B
                 : Op == Operator.Times ? A * B
-                : Op == Operator.Divided ? A / B
-                : default;
-            if (val == default)
-                throw new Exception();
-            return val!;
+                : A / B;
+            return val;
+        }
+
+        readonly EquationBinaryBranch INode.GetBranch()
+        {
+            throw new Exception();
+        }
+
+        readonly Operation<decimal> INode.GetOperation()
+        {
+            return new Operation<decimal>(Convert.ToDecimal(A), Op, Convert.ToDecimal(B));
+        }
+
+        readonly bool INode.IsOperation()
+        {
+            return true;
         }
     }
 }
