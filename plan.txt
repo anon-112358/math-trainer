@@ -7,6 +7,7 @@ generation
 logging scores; improvement
 fast to use UI
 colored text
+see solved equation
 
 architecture
 
@@ -22,3 +23,4 @@ research how to gen equations gooder. Maybe pull from some database of solved eq
 in additionPractice:
     code L/R input
     make it so the text is green for a second after you get it right
+    fix issue where you get "x + -y"
