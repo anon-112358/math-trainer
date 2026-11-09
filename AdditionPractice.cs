@@ -13,8 +13,10 @@ namespace math_trainer
 
         public ValueTask ExecuteAsync(IConsole console)
         {
-            console.WriteLine();
+            Utils.SetupConsole(Practice);
             return default;
         }
+
+        public static void Practice() { }
     }
 }
