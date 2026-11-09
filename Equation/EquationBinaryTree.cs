@@ -1,32 +1,20 @@
 namespace math_trainer.Equation
 {
-    class EquationBinaryTree
+    record class EquationBinaryBranch(INode Left, INode Right, Operator ChildrenRelation) : INode
     {
-        Operation<decimal> value;
-        readonly EquationBinaryTree? left = default;
-        readonly EquationBinaryTree? right = default;
-
-        public EquationBinaryTree(
-            Operation<decimal> inValue = default,
-            EquationBinaryTree? inLeft = default,
-            EquationBinaryTree? inRight = default
-        )
-        {
-            if (value != default && (left != default || right != default))
-                throw new Exception();
-            value = inValue;
-            left = inLeft;
-            right = inRight;
-        }
-
-        public static string Format(EquationBinaryTree tree)
+        public static string Format(EquationBinaryBranch tree)
         {
             throw new NotImplementedException();
         }
 
-        public static string Solve(EquationBinaryTree tree)
+        public static string Solve(EquationBinaryBranch tree)
         {
             throw new NotImplementedException();
+        }
+
+        public class EndNode(Operation<decimal> op) : INode
+        {
+            public Operation<decimal> Operation = op;
         }
     }
 }
