@@ -5,7 +5,40 @@ namespace math_trainer.Equation
     {
         public static string Format(EquationBinaryBranch tree)
         {
-            throw new NotImplementedException();
+            var str = "";
+            if (tree.Left.IsOperation() && tree.Right.IsOperation())
+            {
+                str +=
+                    tree.Left.GetOperation().ToString()
+                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
+                    + tree.Right.GetOperation().ToString();
+            }
+            else if (!tree.Left.IsOperation() && !tree.Right.IsOperation())
+            {
+                str +=
+                    Solve(tree.Left.GetBranch())
+                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
+                    + Solve(tree.Right.GetBranch()).ToString();
+            }
+            else if (tree.Left.IsOperation() && !tree.Right.IsOperation())
+            {
+                str +=
+                    tree.Left.GetOperation().ToString()
+                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
+                    + Solve(tree.Right.GetBranch()).ToString();
+            }
+            else if (!tree.Left.IsOperation() && tree.Right.IsOperation())
+            {
+                str +=
+                    Solve(tree.Left.GetBranch()).ToString()
+                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
+                    + tree.Right.GetOperation();
+            }
+            else
+            {
+                throw new Exception();
+            }
+            return str;
         }
 
         public static EquationBinaryBranch Format(string tree)

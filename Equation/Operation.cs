@@ -15,6 +15,11 @@ namespace math_trainer.Equation
             return val;
         }
 
+        public override readonly string ToString()
+        {
+            return $" {A} {OperatorExtensions.ToSymbol(Op)} {B} ";
+        }
+
         readonly EquationBinaryBranch INode.GetBranch()
         {
             throw new Exception();

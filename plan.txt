@@ -19,6 +19,7 @@ log to sqlite
 
 todo
 
+fix issue wheree cursor doesnt reset when crash
 research how to gen equations gooder. Maybe pull from some database of solved equations step by step?
 in additionPractice:
     code L/R input

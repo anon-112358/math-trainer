@@ -56,7 +56,6 @@ namespace math_trainer
                 if (hasBuffer)
                     Console.Write("\x1b[?1049l");
                 Console.Write("\x1b[?25h");
-                Console.CursorVisible = true;
             }
 
             AppDomain.CurrentDomain.ProcessExit += (_, _) => RestoreTerminal();
@@ -69,7 +68,6 @@ namespace math_trainer
                     Console.Write("\x1b[?1049h");
                     AnsiConsole.Clear();
                 }
-                //AnsiConsole.Cursor.Hide();
 
                 program();
             }
