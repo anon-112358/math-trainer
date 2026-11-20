@@ -10,5 +10,4 @@ generation
 logging scores; improvement
 logging folder
 log to sqlite
-fix issue where cursor doesnt reset when crash, resulting in the error text spilling everywhere
 research how to gen equations gooder. Maybe pull from some database of solved equations step by step?

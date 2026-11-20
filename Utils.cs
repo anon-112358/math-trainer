@@ -51,10 +51,17 @@ namespace math_trainer
         public static void SetupConsole(Action program)
         {
             bool hasBuffer = AnsiConsole.Profile.Capabilities.AlternateBuffer;
+
+            bool hasRestored = false;
             void RestoreTerminal()
             {
+                if (hasRestored)
+                    return;
+
+                hasRestored = true;
                 if (hasBuffer)
                     Console.Write("\x1b[?1049l");
+
                 Console.Write("\x1b[?25h");
             }
 

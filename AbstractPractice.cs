@@ -10,16 +10,19 @@ namespace math_trainer
     public abstract partial class AbstractPractice : ICommand
     {
         [CommandOption("questions", 'q', Description = "Number of questions.")]
-        public int? NumQ { get; set; } = null;
+        public virtual int? NumQ { get; set; } = null;
 
         [CommandOption("min", 'i', Description = "Minimum value of elements.")]
-        public int MinVal { get; set; } = -10;
+        public virtual int MinVal { get; set; } = -10;
 
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
-        public int MaxVal { get; set; } = 30;
+        public virtual int MaxVal { get; set; } = 30;
 
         [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
-        public bool IsDoubles { get; set; } = false;
+        public virtual bool IsDoubles { get; set; } = false;
+
+        [CommandOption("margin", 'm', Description = "Allowed margin of error.")]
+        public virtual decimal Margin { get; set; } = 0m;
 
         public ValueTask ExecuteAsync(IConsole console)
         {
@@ -29,14 +32,22 @@ namespace math_trainer
 
         public abstract Operator Op { get; }
 
-        // override this maybe
-        public INode CreateEquation()
+        public virtual INode CreateEquation()
         {
             return new Operation(
                 Utils.GetNum(MinVal, MaxVal + 1),
                 Op,
                 Utils.GetNum(MinVal, MaxVal + 1)
             );
+        }
+
+        public virtual bool IsAnswerCorrect(decimal correct, decimal user)
+        {
+            var diff = correct - user;
+            if (Margin == 0m)
+                return correct == user;
+            else
+                return diff < Margin && diff > -Margin;
         }
 
         public void Practice()
