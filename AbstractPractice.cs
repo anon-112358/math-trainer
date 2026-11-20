@@ -1,6 +1,7 @@
 using CliFx;
 using CliFx.Binding;
 using CliFx.Infrastructure;
+using math_trainer.Equation;
 using Spectre.Console;
 using static Spectre.Console.AnsiConsole;
 
@@ -9,7 +10,7 @@ namespace math_trainer
     public abstract partial class AbstractPractice : ICommand
     {
         [CommandOption("questions", 'q', Description = "Number of questions.")]
-        public int NumQ { get; set; } = 5;
+        public int? NumQ { get; set; } = null;
 
         [CommandOption("min", 'i', Description = "Minimum value of elements.")]
         public int MinVal { get; set; } = -10;
@@ -26,26 +27,17 @@ namespace math_trainer
             return default;
         }
 
-        public abstract T CalculateAnswer<T>();
-        public abstract T CreateEquation<T>();
+        public abstract decimal CalculateAnswer(EquationBinaryBranch equation);
+        public abstract EquationBinaryBranch CreateEquation();
 
         public void Practice()
         {
-            foreach (var i in Enumerable.Range(0, NumQ))
+            for (int i = 0; NumQ == null || (i < NumQ); i++)
             {
-                decimal numA = Utils.GetNum(MinVal, MaxVal + 1);
-                decimal numB = Utils.GetNum(MinVal, MaxVal + 1);
-
-                if (IsDoubles)
-                {
-                    numA += Utils.GetNum(0, 100) / 100m;
-                    numB += Utils.GetNum(0, 100) / 100m;
-                }
-
-                var answer = numA + numB;
-
-                string question =
-                    $"[#CDD6F4]{(numA):0.##}[/][#FAB387] + [/][#CDD6F4]{(numB):0.##}[/]";
+                var equation = CreateEquation();
+                var answer = CalculateAnswer(equation);
+                string question = equation.ToString();
+                //    $"[#CDD6F4]{(numA):0.##}[/][#FAB387] + [/][#CDD6F4]{(numB):0.##}[/]";
 
                 List<char> keysPressed = [];
 
