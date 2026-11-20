@@ -2,9 +2,9 @@ namespace math_trainer.Equation
 {
     public enum Operator
     {
-        // MDAS
+        // [PE]MDAS
         Times = 0,
-        Divided = 1,
+        DividedBy = 1,
         Minus = 2,
         Plus = 3,
     }
@@ -16,11 +16,22 @@ namespace math_trainer.Equation
             return op switch
             {
                 Operator.Times => '*',
-                Operator.Divided => '/',
+                Operator.DividedBy => '/',
                 Operator.Minus => '-',
                 Operator.Plus => '+',
                 _ => op.ToString().ToCharArray()[0],
             };
+        }
+
+        public static string ToColor(this Operator op)
+        {
+            return new Dictionary<Operator, string>()
+            {
+                [Operator.Plus] = Constants.AddMarkupColor,
+                [Operator.Minus] = Constants.SubMarkupColor,
+                [Operator.Times] = Constants.MulMarkupColor,
+                [Operator.DividedBy] = Constants.DivMarkupColor,
+            }[op];
         }
     }
 }

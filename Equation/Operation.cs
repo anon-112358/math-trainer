@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace math_trainer.Equation
 {
     public record struct Operation(decimal A, Operator Op, decimal B) : INode
@@ -16,7 +14,9 @@ namespace math_trainer.Equation
 
         public override readonly string ToString()
         {
-            return $" {A} {OperatorExtensions.ToSymbol(Op)} {B} ";
+            return $"[{Constants.NumMarkupColor}]{A}[/]"
+                + $" [{Op.ToColor()}]{Op.ToSymbol()}[/]"
+                + $" [{Constants.NumMarkupColor}]{B}[/]";
         }
 
         readonly EquationBinaryBranch INode.GetBranch()
