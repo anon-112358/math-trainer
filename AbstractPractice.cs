@@ -27,15 +27,24 @@ namespace math_trainer
             return default;
         }
 
-        public abstract decimal CalculateAnswer(EquationBinaryBranch equation);
-        public abstract EquationBinaryBranch CreateEquation();
+        public abstract Operator Op { get; }
+
+        // override this maybe
+        public INode CreateEquation()
+        {
+            return new Operation(
+                Utils.GetNum(MinVal, MaxVal + 1),
+                Op,
+                Utils.GetNum(MinVal, MaxVal + 1)
+            );
+        }
 
         public void Practice()
         {
             for (int i = 0; NumQ == null || (i < NumQ); i++)
             {
                 var equation = CreateEquation();
-                var answer = CalculateAnswer(equation);
+                var answer = equation.Solve();
                 string question = equation.ToString();
                 //    $"[#CDD6F4]{(numA):0.##}[/][#FAB387] + [/][#CDD6F4]{(numB):0.##}[/]";
 

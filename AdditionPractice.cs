@@ -10,8 +10,6 @@ namespace math_trainer
     [Command("add")]
     public partial class AdditionPractice : AbstractPractice
     {
-        public override EquationBinaryBranch CreateEquation() { }
-
-        public override decimal CalculateAnswer(EquationBinaryBranch equation) { }
+        public override Operator Op { get; } = Operator.Plus;
     }
 }

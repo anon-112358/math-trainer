@@ -3,42 +3,9 @@ namespace math_trainer.Equation
     public record class EquationBinaryBranch(INode Left, INode Right, Operator ChildrenRelation)
         : INode
     {
-        public static string Format(EquationBinaryBranch tree)
+        public string Format()
         {
-            var str = "";
-            if (tree.Left.IsOperation() && tree.Right.IsOperation())
-            {
-                str +=
-                    tree.Left.GetOperation().ToString()
-                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
-                    + tree.Right.GetOperation().ToString();
-            }
-            else if (!tree.Left.IsOperation() && !tree.Right.IsOperation())
-            {
-                str +=
-                    Solve(tree.Left.GetBranch())
-                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
-                    + Solve(tree.Right.GetBranch()).ToString();
-            }
-            else if (tree.Left.IsOperation() && !tree.Right.IsOperation())
-            {
-                str +=
-                    tree.Left.GetOperation().ToString()
-                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
-                    + Solve(tree.Right.GetBranch()).ToString();
-            }
-            else if (!tree.Left.IsOperation() && tree.Right.IsOperation())
-            {
-                str +=
-                    Solve(tree.Left.GetBranch()).ToString()
-                    + OperatorExtensions.ToSymbol(tree.ChildrenRelation)
-                    + tree.Right.GetOperation();
-            }
-            else
-            {
-                throw new Exception();
-            }
-            return str;
+            throw new NotImplementedException();
         }
 
         public static EquationBinaryBranch Format(string tree)
@@ -46,38 +13,38 @@ namespace math_trainer.Equation
             throw new NotImplementedException();
         }
 
-        public static decimal Solve(EquationBinaryBranch tree)
+        public decimal Solve()
         {
-            if (tree.Left.IsOperation() && tree.Right.IsOperation())
+            if (Left.IsOperation() && Right.IsOperation())
             {
-                return new Operation<decimal>(
-                    tree.Left.GetOperation().Solve(),
-                    tree.ChildrenRelation,
-                    tree.Right.GetOperation().Solve()
+                return new Operation(
+                    Left.GetOperation().Solve(),
+                    ChildrenRelation,
+                    Right.GetOperation().Solve()
                 ).Solve();
             }
-            else if (!tree.Left.IsOperation() && !tree.Right.IsOperation())
+            else if (!Left.IsOperation() && !Right.IsOperation())
             {
-                return new Operation<decimal>(
-                    Solve(tree.Left.GetBranch()),
-                    tree.ChildrenRelation,
-                    Solve(tree.Right.GetBranch())
+                return new Operation(
+                    (Left.GetBranch().Solve()),
+                    ChildrenRelation,
+                    Right.GetBranch().Solve()
                 ).Solve();
             }
-            else if (tree.Left.IsOperation() && !tree.Right.IsOperation())
+            else if (Left.IsOperation() && !Right.IsOperation())
             {
-                return new Operation<decimal>(
-                    tree.Left.GetOperation().Solve(),
-                    tree.ChildrenRelation,
-                    Solve(tree.Right.GetBranch())
+                return new Operation(
+                    Left.GetOperation().Solve(),
+                    ChildrenRelation,
+                    Right.GetBranch().Solve()
                 ).Solve();
             }
-            else if (!tree.Left.IsOperation() && tree.Right.IsOperation())
+            else if (!Left.IsOperation() && Right.IsOperation())
             {
-                return new Operation<decimal>(
-                    Solve(tree.Left.GetBranch()),
-                    tree.ChildrenRelation,
-                    tree.Right.GetOperation().Solve()
+                return new Operation(
+                    Left.GetBranch().Solve(),
+                    ChildrenRelation,
+                    Right.GetOperation().Solve()
                 ).Solve();
             }
             else
@@ -91,7 +58,7 @@ namespace math_trainer.Equation
             return this;
         }
 
-        Operation<decimal> INode.GetOperation()
+        Operation INode.GetOperation()
         {
             throw new Exception();
         }

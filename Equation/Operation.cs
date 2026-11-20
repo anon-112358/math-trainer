@@ -2,12 +2,11 @@ using System.Numerics;
 
 namespace math_trainer.Equation
 {
-    public record struct Operation<T>(T A, Operator Op, T B) : INode
-        where T : INumber<T>
+    public record struct Operation(decimal A, Operator Op, decimal B) : INode
     {
-        public readonly T Solve()
+        public readonly decimal Solve()
         {
-            T val =
+            decimal val =
                 Op == Operator.Plus ? A + B
                 : Op == Operator.Minus ? A - B
                 : Op == Operator.Times ? A * B
@@ -25,9 +24,9 @@ namespace math_trainer.Equation
             throw new Exception();
         }
 
-        readonly Operation<decimal> INode.GetOperation()
+        readonly Operation INode.GetOperation()
         {
-            return new Operation<decimal>(Convert.ToDecimal(A), Op, Convert.ToDecimal(B));
+            return new Operation(Convert.ToDecimal(A), Op, Convert.ToDecimal(B));
         }
 
         readonly bool INode.IsOperation()
