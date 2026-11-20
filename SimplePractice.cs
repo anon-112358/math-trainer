@@ -47,12 +47,8 @@ namespace math_trainer
 
             public override Operation CreateEquation()
             {
-                var tryCount = 0;
                 if (AreUndivisblesAllowed)
                     return base.CreateEquation();
-
-                var a = 0m;
-                var b = 0m;
 
                 bool baseCondition(decimal a, decimal b) => (b == 0m || a % b != 0m);
 
@@ -65,20 +61,24 @@ namespace math_trainer
                         || _trivialAnswers.Contains(answer);
                 }
 
+                bool ConstrainCondition(decimal a, decimal b)
+                {
+                    var answer = new Operation(a, Op, b).Solve();
+                    var result = MaxAnswer == null || MaxAnswer >= answer;
+                    return !(result && (MinAnswer == null || MinAnswer <= answer));
+                }
+
                 Func<decimal, decimal, bool> Condition = AreTrivialNumbersAllowed
                     ? baseCondition
                     : nonTrivialCondition;
 
-                while (Condition(a, b))
-                {
-                    a = Utils.GetNum(MinVal, MaxVal + 1);
-                    b = Utils.GetNum(MinVal, MaxVal + 1);
+                var _condition = Condition;
+                Condition = (a, b) => _condition(a, b) || ConstrainCondition(a, b);
 
-                    if (tryCount >= 1000)
-                        throw new InvalidOperationException("No valid answers found for params.");
-
-                    tryCount += 1;
-                }
+                var (a, b) = Utils.FindNumberWithCondition(
+                    Condition,
+                    () => Utils.GetNum(MinVal, MaxVal + 1)
+                );
 
                 return new Operation(a, Op, b);
             }

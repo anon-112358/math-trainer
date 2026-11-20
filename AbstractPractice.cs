@@ -18,12 +18,10 @@ namespace math_trainer
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
         public virtual int MaxVal { get; set; } = 30;
 
-        //todo implement
-        [CommandOption("min_answer", 'n', Description = "Minimum value of elements.")]
+        [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
         public virtual int? MinAnswer { get; set; } = null;
 
-        //todo implement
-        [CommandOption("max_answer", 's', Description = "Maximum value of elements.")]
+        [CommandOption("max_answer", 's', Description = "Maximum value of answer.")]
         public virtual int? MaxAnswer { get; set; } = null;
 
         [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
@@ -42,11 +40,24 @@ namespace math_trainer
 
         public virtual Operation CreateEquation()
         {
-            return new Operation(
-                Utils.GetNum(MinVal, MaxVal + 1),
-                Op,
-                Utils.GetNum(MinVal, MaxVal + 1)
-            );
+            var (a, b) = ConstrainAnswer();
+            return new Operation(a, Op, b);
+        }
+
+        private Tuple<decimal, decimal> ConstrainAnswer()
+        {
+            if (MinAnswer == null && MaxAnswer == null)
+                return new(Utils.GetNum(MinVal, MaxVal + 1), Utils.GetNum(MinVal, MaxVal + 1));
+            else
+                return Utils.FindNumberWithCondition(
+                    (a, b) =>
+                    {
+                        var answer = new Operation(a, Op, b).Solve();
+                        var result = MaxAnswer == null || MaxAnswer >= answer;
+                        return result && (MinAnswer == null || MinAnswer <= answer);
+                    },
+                    () => Utils.GetNum(MinVal, MaxVal + 1)
+                );
         }
 
         public virtual bool IsAnswerCorrect(decimal correct, decimal user)

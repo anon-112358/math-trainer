@@ -2,6 +2,7 @@ namespace math_trainer.Equation
 {
     public record struct Operation(decimal A, Operator Op, decimal B) : INode
     {
+        // todo make lazy
         public readonly decimal Solve()
         {
             decimal val =

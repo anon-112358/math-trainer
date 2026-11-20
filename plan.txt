@@ -11,3 +11,4 @@ logging scores; improvement
 logging folder
 log to sqlite
 research how to gen equations gooder. Maybe pull from some database of solved equations step by step?
+add question log and try to avoid repeating questions from that info

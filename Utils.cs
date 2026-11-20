@@ -84,6 +84,30 @@ namespace math_trainer
             }
         }
 
+        public static Tuple<decimal, decimal> FindNumberWithCondition(
+            Func<decimal, decimal, bool> boolFactory,
+            Func<decimal> decimalFactory
+        )
+        {
+            var tryCount = 0;
+
+            var a = 0m;
+            var b = 0m;
+
+            while (boolFactory(a, b))
+            {
+                a = decimalFactory();
+                b = decimalFactory();
+
+                if (tryCount >= 2000)
+                    throw new InvalidOperationException("No valid answers found for params.");
+
+                tryCount += 1;
+            }
+
+            return new(a, b);
+        }
+
         public static readonly HashSet<char> Numbers =
         [
             '1',
