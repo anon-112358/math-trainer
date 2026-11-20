@@ -18,6 +18,14 @@ namespace math_trainer
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
         public virtual int MaxVal { get; set; } = 30;
 
+        //todo implement
+        [CommandOption("min_answer", 'n', Description = "Minimum value of elements.")]
+        public virtual int? MinAnswer { get; set; } = null;
+
+        //todo implement
+        [CommandOption("max_answer", 's', Description = "Maximum value of elements.")]
+        public virtual int? MaxAnswer { get; set; } = null;
+
         [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
         public virtual bool IsDoubles { get; set; } = false;
 
@@ -32,7 +40,7 @@ namespace math_trainer
 
         public abstract Operator Op { get; }
 
-        public virtual INode CreateEquation()
+        public virtual Operation CreateEquation()
         {
             return new Operation(
                 Utils.GetNum(MinVal, MaxVal + 1),

@@ -17,7 +17,7 @@ namespace math_trainer
         {
             public override Operator Op { get; } = Operator.Minus;
 
-            public override INode CreateEquation()
+            public override Operation CreateEquation()
             {
                 var b = Utils.GetNum(MinVal, MaxVal + 1);
                 b = b < 0 ? 0 : b;
@@ -36,28 +36,48 @@ namespace math_trainer
         public partial class DivisionPractice : AbstractPractice
         {
             public override Operator Op { get; } = Operator.DividedBy;
-
             public override decimal Margin { get; set; } = 0.05m;
+            readonly decimal[] trivialAnswers = [0m, 1m, -1m];
 
-            [CommandOption(
-                "divisible",
-                'v',
-                Description = "Allow only divisible pairs of numbers."
-            )]
-            public bool DivisiblesOnly { get; set; } = false;
+            [CommandOption("divisible", 'v', Description = "Allow non-divisible pairs of numbers.")]
+            public bool AreUndivisblesAllowed { get; set; } = false;
 
-            public override INode CreateEquation()
+            [CommandOption("trivial", 't', Description = "Allow trivial answers.")]
+            public bool AreTrivialNumbersAllowed { get; set; } = false;
+
+            public override Operation CreateEquation()
             {
-                if (!DivisiblesOnly)
+                var tryCount = 0;
+                if (AreUndivisblesAllowed)
                     return base.CreateEquation();
 
                 var a = 0m;
                 var b = 0m;
 
-                while ((b == 0 || a % b != 0))
+                bool baseCondition(decimal a, decimal b) => (b == 0m || a % b != 0m);
+
+                bool nonTrivialCondition(decimal a, decimal b)
+                {
+                    decimal[] _trivialAnswers = [a, b, -a, -b];
+                    var answer = a / (b == 0 ? 1 : b);
+                    return baseCondition(a, b)
+                        || trivialAnswers.Contains(answer)
+                        || _trivialAnswers.Contains(answer);
+                }
+
+                Func<decimal, decimal, bool> Condition = AreTrivialNumbersAllowed
+                    ? baseCondition
+                    : nonTrivialCondition;
+
+                while (Condition(a, b))
                 {
                     a = Utils.GetNum(MinVal, MaxVal + 1);
                     b = Utils.GetNum(MinVal, MaxVal + 1);
+
+                    if (tryCount >= 1000)
+                        throw new InvalidOperationException("No valid answers found for params.");
+
+                    tryCount += 1;
                 }
 
                 return new Operation(a, Op, b);
