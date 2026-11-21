@@ -17,20 +17,5 @@ namespace math_trainer.Equation
         {
             return new Operation(Left.Solve(), ChildrenRelation, Right.Solve()).Solve();
         }
-
-        EquationBinaryBranch INode.GetBranch()
-        {
-            return this;
-        }
-
-        Operation INode.GetOperation()
-        {
-            throw new Exception();
-        }
-
-        bool INode.IsOperation()
-        {
-            return false;
-        }
     }
 }

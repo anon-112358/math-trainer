@@ -40,15 +40,19 @@ namespace math_trainer
             public override int MaxVal { get; set; } = 100;
             readonly decimal[] trivialAnswers = [0m, 1m, -1m];
 
-            [CommandOption("divisible", 'v', Description = "Allow non-divisible pairs of numbers.")]
-            public bool AreUndivisblesAllowed { get; set; } = false;
+            [CommandOption(
+                "no_divisibility",
+                'v',
+                Description = "Allow non-divisible pairs of numbers."
+            )]
+            public bool AreUndivisiblesAllowed { get; set; } = false;
 
             [CommandOption("trivial", 't', Description = "Allow trivial answers.")]
             public bool AreTrivialNumbersAllowed { get; set; } = false;
 
             public override Operation CreateEquation()
             {
-                if (AreUndivisblesAllowed)
+                if (AreUndivisiblesAllowed)
                     return base.CreateEquation();
 
                 bool baseCondition(decimal a, decimal b) => (b == 0m || a % b != 0m);

@@ -25,13 +25,14 @@ namespace math_trainer.Equation
 
         public static string ToColor(this Operator op)
         {
-            return new Dictionary<Operator, string>()
+            return op switch
             {
-                [Operator.Plus] = Constants.AddMarkupColor,
-                [Operator.Minus] = Constants.SubMarkupColor,
-                [Operator.Times] = Constants.MulMarkupColor,
-                [Operator.DividedBy] = Constants.DivMarkupColor,
-            }[op];
+                Operator.Plus => Constants.AddMarkupColor,
+                Operator.Minus => Constants.SubMarkupColor,
+                Operator.Times => Constants.MulMarkupColor,
+                Operator.DividedBy => Constants.DivMarkupColor,
+                _ => "#FFFFFF",
+            };
         }
     }
 }

@@ -12,6 +12,7 @@ namespace math_trainer
         [CommandOption("questions", 'q', Description = "Number of questions.")]
         public virtual int? NumQ { get; set; } = null;
 
+        // todo implement
         [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
         public virtual bool IsDoubles { get; set; } = false;
 
@@ -52,6 +53,8 @@ namespace math_trainer
                 return Utils.FindNumbersThatAreFalse(
                     boolFactory: (a, b) =>
                     {
+                        if (Op == Operator.DividedBy && b == 0)
+                            return true;
                         var answer = new Operation(a, Op, b).Solve();
                         return (
                             !(MaxAnswer == null && MinAnswer == null)
@@ -98,9 +101,16 @@ namespace math_trainer
                     MarkupLine(question + '\n');
                     AnsiConsole.Write(String.Join("", keysPressed));
 
-                    var press = System.Console.ReadKey();
+                    var press = System.Console.ReadKey(intercept: true);
 
-                    if (Utils.Numbers.Contains(press.KeyChar))
+                    decimal userAnswer = 0;
+                    if (
+                        Utils.Numbers.Contains(press.KeyChar)
+                        && Decimal.TryParse(
+                            new String([.. keysPressed]) + press.KeyChar,
+                            out userAnswer
+                        )
+                    )
                         keysPressed.Add(press.KeyChar);
                     else if (press.KeyChar == '\b' && keysPressed.Count > 0)
                     {
@@ -111,14 +121,6 @@ namespace math_trainer
                         && (press.KeyChar == 'Q' || press.KeyChar == 'q')
                     )
                         return;
-
-                    decimal? userAnswer = null;
-
-                    try
-                    {
-                        userAnswer = Decimal.Parse(new String([.. keysPressed]));
-                    }
-                    catch { }
 
                     if (IsAnswerCorrect(answer, userAnswer))
                         break;

@@ -19,20 +19,5 @@ namespace math_trainer.Equation
                 + $" [{Op.ToColor()}]{Op.ToSymbol()}[/]"
                 + $" [{Constants.NumMarkupColor}]{B}[/]";
         }
-
-        readonly EquationBinaryBranch INode.GetBranch()
-        {
-            throw new Exception();
-        }
-
-        readonly Operation INode.GetOperation()
-        {
-            return new Operation(Convert.ToDecimal(A), Op, Convert.ToDecimal(B));
-        }
-
-        readonly bool INode.IsOperation()
-        {
-            return true;
-        }
     }
 }

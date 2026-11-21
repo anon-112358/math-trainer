@@ -19,15 +19,6 @@ namespace math_trainer
             Console.Write("\x1b[u");
         }
 
-        public static decimal PowerOf(decimal num, int power)
-        {
-            for (int i = 0; i < power; i++)
-            {
-                num *= num;
-            }
-            return num;
-        }
-
         public static void PrintToTopRight(string str, string color = "default")
         {
             TopRightStr = str;
