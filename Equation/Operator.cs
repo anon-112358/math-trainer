@@ -30,7 +30,7 @@ namespace math_trainer.Equation
             return op switch
             {
                 Operator.Times => Operator.DividedBy,
-                Operator.DividedBy => Operator.DividedBy,
+                Operator.DividedBy => Operator.Times,
                 Operator.Minus => Operator.Plus,
                 Operator.Plus => Operator.Minus,
                 _ => throw new Exception(),

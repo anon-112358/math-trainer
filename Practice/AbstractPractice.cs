@@ -28,19 +28,19 @@ namespace math_trainer.Practice
         public abstract int MaxVal { get; set; }
 
         // todo implement
-        [CommandOption("minA", 'f', Description = "Minimum value of elements.")]
+        [CommandOption("minA", 'f', Description = "Minimum value of the first element.")]
         public virtual int MinA { get; set; }
 
         // todo implement
-        [CommandOption("maxA", 'g', Description = "Maximum value of elements.")]
+        [CommandOption("maxA", 'g', Description = "Maximum value of the first element.")]
         public virtual int MaxA { get; set; }
 
         // todo implement
-        [CommandOption("minB", 'l', Description = "Minimum value of elements.")]
+        [CommandOption("minB", 'l', Description = "Minimum value of the second element.")]
         public virtual int MinB { get; set; }
 
         // todo implement
-        [CommandOption("maxB", 'm', Description = "Maximum value of elements.")]
+        [CommandOption("maxB", 'm', Description = "Maximum value of the second element.")]
         public virtual int MaxB { get; set; }
 
         [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
@@ -123,17 +123,14 @@ namespace math_trainer.Practice
 
                     var press = System.Console.ReadKey(intercept: true);
 
-                    decimal userAnswer = decimal.MaxValue / 2;
+                    var isSuccess = Decimal.TryParse(
+                        s: new String(value: [.. keysPressed]) + press.KeyChar,
+                        provider: CultureInfo.InvariantCulture,
+                        result: out decimal userAnswer
+                    );
                     if (
                         Utils.Numbers.Contains(press.KeyChar)
-                        && (
-                            Decimal.TryParse(
-                                new String([.. keysPressed]) + press.KeyChar,
-                                CultureInfo.InvariantCulture,
-                                out userAnswer
-                            )
-                            || press.KeyChar == '-'
-                        )
+                        && (isSuccess || (press.KeyChar == '-' && keysPressed.Count == 0))
                     )
                         keysPressed.Add(press.KeyChar);
                     else if (press.KeyChar == '\b' && keysPressed.Count > 0)
@@ -151,7 +148,7 @@ namespace math_trainer.Practice
                     )
                         break;
 
-                    if (IsAnswerCorrect(answer, userAnswer))
+                    if (isSuccess && IsAnswerCorrect(answer, userAnswer))
                         break;
                 }
             }
