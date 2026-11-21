@@ -36,11 +36,11 @@ namespace math_trainer.Practice
         public virtual int MaxA { get; set; }
 
         // todo implement
-        [CommandOption("minB", 'h', Description = "Minimum value of elements.")]
+        [CommandOption("minB", 'l', Description = "Minimum value of elements.")]
         public virtual int MinB { get; set; }
 
         // todo implement
-        [CommandOption("maxB", 'l', Description = "Maximum value of elements.")]
+        [CommandOption("maxB", 'm', Description = "Maximum value of elements.")]
         public virtual int MaxB { get; set; }
 
         [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
