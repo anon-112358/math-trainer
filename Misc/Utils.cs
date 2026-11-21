@@ -1,6 +1,6 @@
 using Spectre.Console;
 
-namespace math_trainer
+namespace math_trainer.Misc
 {
     public static class Utils
     {

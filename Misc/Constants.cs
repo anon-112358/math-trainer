@@ -1,4 +1,4 @@
-namespace math_trainer
+namespace math_trainer.Misc
 {
     public static class Constants
     {

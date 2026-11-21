@@ -1,3 +1,5 @@
+using math_trainer.Misc;
+
 namespace math_trainer.Equation
 {
     public enum Operator

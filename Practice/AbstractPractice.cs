@@ -3,10 +3,11 @@ using CliFx;
 using CliFx.Binding;
 using CliFx.Infrastructure;
 using math_trainer.Equation;
+using math_trainer.Misc;
 using Spectre.Console;
 using static Spectre.Console.AnsiConsole;
 
-namespace math_trainer
+namespace math_trainer.Practice
 {
     public abstract partial class AbstractPractice : ICommand
     {

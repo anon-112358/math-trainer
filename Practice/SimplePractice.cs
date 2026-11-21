@@ -1,8 +1,9 @@
 using System.ComponentModel;
 using CliFx.Binding;
 using math_trainer.Equation;
+using math_trainer.Misc;
 
-namespace math_trainer
+namespace math_trainer.Practice
 {
     public partial class SimplePractice
     {
