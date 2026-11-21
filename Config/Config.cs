@@ -1,8 +1,12 @@
+#pragma warning disable EF1002
+
+using System.Reflection;
 using System.Text;
 using CliFx;
 using CliFx.Binding;
 using CliFx.Infrastructure;
 using math_trainer.Misc;
+using Microsoft.EntityFrameworkCore;
 
 namespace math_trainer.Config
 {
@@ -14,7 +18,21 @@ namespace math_trainer.Config
         private static ConfigData Load()
         {
             using var db = Utils.DatabaseContext.SetupDb();
-            return db.ConfigData.FirstOrDefault() ?? new ConfigData();
+
+            ConfigData? data;
+
+            try
+            {
+                data = db.ConfigData.FirstOrDefault() ?? new ConfigData();
+            }
+            catch
+            {
+                db.Database.ExecuteSqlRaw($"DROP TABLE IF EXISTS {typeof(ConfigData).Name}");
+                Utils.DatabaseContext.SetupDb().Dispose();
+                data = new ConfigData();
+            }
+
+            return data!;
         }
 
         [Command("config set", Description = "Set a setting.")]
@@ -28,22 +46,39 @@ namespace math_trainer.Config
 
             public ValueTask ExecuteAsync(IConsole _)
             {
-                var prop =
-                    Data.GetType().GetProperty(KeyToChange)
-                    ?? throw new CommandException(
+                var prop = Data.GetType()
+                    .GetProperty(
+                        KeyToChange,
+                        BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
+                    );
+
+                if (prop == null || !prop.IsDefined(typeof(Utils.SettingAttribute), true))
+                    throw new CommandException(
                         "Invalid option. Valid options:\n"
                             + ConfigList.GetFormattedSettings(withStart: false, withValues: false)
                     );
 
-                prop.SetValue(Data, ValToChange);
+                object? converted;
+                try
+                {
+                    converted = Convert.ChangeType(ValToChange, prop.PropertyType);
+                }
+                catch
+                {
+                    throw new CommandException(
+                        $"Invalid value for '{KeyToChange}'. Correct type: {prop.PropertyType.Name}"
+                    );
+                }
+
+                prop.SetValue(Data, converted);
 
                 using var db = Utils.DatabaseContext.SetupDb();
                 db.ConfigData.RemoveRange(db.ConfigData);
                 db.Add(Data);
 
-                Console.WriteLine($"Successfully changed '{KeyToChange}' to '{ValToChange}'.");
-
                 db.SaveChanges();
+
+                Console.WriteLine($"Successfully changed '{KeyToChange}' to '{ValToChange}'.");
 
                 return default;
             }
@@ -74,7 +109,7 @@ namespace math_trainer.Config
 
                 foreach (var prop in dataType.GetProperties())
                 {
-                    if (prop.Name != "Id")
+                    if (prop.IsDefined(typeof(Utils.SettingAttribute), true))
                         builder.AppendLine(
                             $"  - {prop.Name}" + (withValues ? $": {prop.GetValue(data)}" : "")
                         );

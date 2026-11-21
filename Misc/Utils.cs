@@ -116,6 +116,9 @@ namespace math_trainer.Misc
             '-',
         ];
 
+        [AttributeUsage(AttributeTargets.Property)]
+        public class SettingAttribute : Attribute { }
+
         public class DatabaseContext : DbContext
         {
             public DbSet<Config.ConfigData> ConfigData { get; set; }
@@ -138,6 +141,20 @@ namespace math_trainer.Misc
                 var db = new DatabaseContext();
                 db.Database.EnsureCreated();
                 return db;
+            }
+        }
+
+        public static bool DoesTableMatch<T>(DbContext context)
+            where T : class
+        {
+            try
+            {
+                _ = context.Set<T>().AsNoTracking().FirstOrDefault();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
