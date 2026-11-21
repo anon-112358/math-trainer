@@ -11,6 +11,12 @@ namespace math_trainer.Practice
 {
     public abstract partial class AbstractPractice : ICommand
     {
+        [AttributeUsage(AttributeTargets.Property)]
+        public class NoOverwriteAttribute : Attribute { }
+
+        [NoOverwrite]
+        public abstract Operator? Op { get; }
+
         [CommandOption("questions", 'q', Description = "Number of questions.")]
         public virtual int? NumQ { get; set; } = null;
 
@@ -22,26 +28,26 @@ namespace math_trainer.Practice
         public virtual decimal Margin { get; set; } = 0m;
 
         [CommandOption("min", 'i', Description = "Minimum value of elements.")]
-        public abstract int MinVal { get; set; }
+        public abstract int? MinVal { get; set; }
 
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
-        public abstract int MaxVal { get; set; }
+        public abstract int? MaxVal { get; set; }
 
         // todo implement
         [CommandOption("minA", 'f', Description = "Minimum value of the first element.")]
-        public virtual int MinA { get; set; }
+        public virtual int? MinA { get; set; } = null;
 
         // todo implement
         [CommandOption("maxA", 'g', Description = "Maximum value of the first element.")]
-        public virtual int MaxA { get; set; }
+        public virtual int? MaxA { get; set; } = null;
 
         // todo implement
         [CommandOption("minB", 'l', Description = "Minimum value of the second element.")]
-        public virtual int MinB { get; set; }
+        public virtual int? MinB { get; set; } = null;
 
         // todo implement
         [CommandOption("maxB", 'm', Description = "Maximum value of the second element.")]
-        public virtual int MaxB { get; set; }
+        public virtual int? MaxB { get; set; } = null;
 
         [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
         public virtual int? MinAnswer { get; set; } = null;
@@ -55,25 +61,33 @@ namespace math_trainer.Practice
             return default;
         }
 
-        public abstract Operator Op { get; }
-
         public virtual Operation CreateEquation()
         {
             var (a, b) = ConstrainAnswer();
-            return new Operation(a, Op, b);
+            return new Operation(a, Op ?? throw new InvalidDataException(), b);
         }
 
         private Tuple<decimal, decimal> ConstrainAnswer()
         {
+            if (MinVal == null || MaxVal == null)
+                throw new InvalidDataException();
+
+            int min = (int)MinVal;
+            int max = (int)MaxVal;
+
             if (MinAnswer == null && MaxAnswer == null)
-                return new(Utils.GetNum(MinVal, MaxVal + 1), Utils.GetNum(MinVal, MaxVal + 1));
+                return new(Utils.GetNum(min, max + 1), Utils.GetNum(min, max + 1));
             else
                 return Utils.FindNumbersThatAreFalse(
                     boolFactory: (a, b) =>
                     {
                         if (Op == Operator.DividedBy && b == 0)
                             return true;
-                        var answer = new Operation(a, Op, b).Solve();
+                        var answer = new Operation(
+                            a,
+                            Op ?? throw new InvalidDataException(),
+                            b
+                        ).Solve();
                         return (
                             // i like it ok
                             !(MaxAnswer == null && MinAnswer == null)
@@ -89,7 +103,7 @@ namespace math_trainer.Practice
                             )
                         );
                     },
-                    decimalFactory: () => Utils.GetNum(MinVal, MaxVal + 1)
+                    decimalFactory: () => Utils.GetNum(min, max + 1)
                 );
         }
 

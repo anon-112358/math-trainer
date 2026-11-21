@@ -10,35 +10,35 @@ namespace math_trainer.Practice
         [Command("add", Description = "Practice addition.")]
         public partial class AdditionPractice : AbstractPractice
         {
-            public override Operator Op { get; } = Operator.Plus;
-            public override int MinVal { get; set; } = -10;
-            public override int MaxVal { get; set; } = 50;
+            public override Operator? Op { get; } = Operator.Plus;
+            public override int? MinVal { get; set; } = -10;
+            public override int? MaxVal { get; set; } = 50;
         }
 
         [Command("sub", Description = "Practice subtraction.")]
         public partial class SubtractionPractice : AbstractPractice
         {
-            public override Operator Op { get; } = Operator.Minus;
-            public override int MinVal { get; set; } = -50;
-            public override int MaxVal { get; set; } = 99;
+            public override Operator? Op { get; } = Operator.Minus;
+            public override int? MinVal { get; set; } = -50;
+            public override int? MaxVal { get; set; } = 99;
         }
 
         [Command("mul", Description = "Practice multiplication.")]
         public partial class MultiplicationPractice : AbstractPractice
         {
-            public override Operator Op { get; } = Operator.Times;
+            public override Operator? Op { get; } = Operator.Times;
             public override decimal Margin { get; set; } = 0.05m;
-            public override int MinVal { get; set; } = -20;
-            public override int MaxVal { get; set; } = 50;
+            public override int? MinVal { get; set; } = -20;
+            public override int? MaxVal { get; set; } = 50;
         }
 
         [Command("div", Description = "Practice divisions.")]
         public partial class DivisionPractice : AbstractPractice
         {
-            public override Operator Op { get; } = Operator.DividedBy;
+            public override Operator? Op { get; } = Operator.DividedBy;
             public override decimal Margin { get; set; } = 0.05m;
-            public override int MinVal { get; set; } = 0;
-            public override int MaxVal { get; set; } = 100;
+            public override int? MinVal { get; set; } = 0;
+            public override int? MaxVal { get; set; } = 100;
 
             [CommandOption(
                 "no_divisibility",
@@ -55,6 +55,12 @@ namespace math_trainer.Practice
                 if (AreUndivisiblesAllowed)
                     return base.CreateEquation();
 
+                if (MinVal == null || MaxVal == null)
+                    throw new InvalidDataException();
+
+                int min = (int)MinVal;
+                int max = (int)MaxVal;
+
                 bool baseCondition(decimal a, decimal b) => (b == 0m || a % b != 0m);
 
                 bool nonTrivialCondition(decimal a, decimal b)
@@ -66,7 +72,11 @@ namespace math_trainer.Practice
 
                 bool ConstrainCondition(decimal a, decimal b)
                 {
-                    var answer = new Operation(a, Op, b).Solve();
+                    var answer = new Operation(
+                        a,
+                        Op ?? throw new InvalidDataException(),
+                        b
+                    ).Solve();
                     var result = MaxAnswer == null || MaxAnswer >= answer;
                     return !(result && (MinAnswer == null || MinAnswer <= answer));
                 }
@@ -80,10 +90,10 @@ namespace math_trainer.Practice
 
                 var (a, b) = Utils.FindNumbersThatAreFalse(
                     Condition,
-                    () => Utils.GetNum(MinVal, MaxVal + 1)
+                    () => Utils.GetNum(min, max + 1)
                 );
 
-                return new Operation(a, Op, b);
+                return new Operation(a, Op ?? throw new InvalidDataException(), b);
             }
         }
     }

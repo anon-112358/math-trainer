@@ -90,7 +90,7 @@ namespace math_trainer.Misc
                 a = decimalFactory();
                 b = decimalFactory();
 
-                if (tryCount >= 2000)
+                if (tryCount >= 20000)
                     throw new InvalidOperationException("No valid answers found for params.");
 
                 tryCount += 1;

@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
     <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>math_trainer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -12,5 +13,4 @@
     <PackageReference Include="CliFx" Version="3.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.57.2" />
   </ItemGroup>
-
 </Project>
