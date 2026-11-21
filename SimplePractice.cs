@@ -38,11 +38,10 @@ namespace math_trainer
             public override decimal Margin { get; set; } = 0.05m;
             public override int MinVal { get; set; } = 0;
             public override int MaxVal { get; set; } = 100;
-            readonly decimal[] trivialAnswers = [0m, 1m, -1m];
 
             [CommandOption(
                 "no_divisibility",
-                'v',
+                'd',
                 Description = "Allow non-divisible pairs of numbers."
             )]
             public bool AreUndivisiblesAllowed { get; set; } = false;
@@ -59,11 +58,9 @@ namespace math_trainer
 
                 bool nonTrivialCondition(decimal a, decimal b)
                 {
-                    decimal[] _trivialAnswers = [a, b, -a, -b];
+                    decimal[] trivialAnswers = [a, -a, 0m, 1m, -1m];
                     var answer = a / (b == 0 ? 1 : b);
-                    return baseCondition(a, b)
-                        || trivialAnswers.Contains(answer)
-                        || _trivialAnswers.Contains(answer);
+                    return baseCondition(a, b) || trivialAnswers.Contains(answer);
                 }
 
                 bool ConstrainCondition(decimal a, decimal b)

@@ -1,3 +1,4 @@
+using System.Globalization;
 using CliFx;
 using CliFx.Binding;
 using CliFx.Infrastructure;
@@ -13,10 +14,10 @@ namespace math_trainer
         public virtual int? NumQ { get; set; } = null;
 
         // todo implement
-        [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
+        [CommandOption("decimals", 'c', Description = "Whether or not to include decimals.")]
         public virtual bool IsDoubles { get; set; } = false;
 
-        [CommandOption("margin", 'm', Description = "Allowed margin of error.")]
+        [CommandOption("error", 'e', Description = "Allowed margin of error.")]
         public virtual decimal Margin { get; set; } = 0m;
 
         [CommandOption("min", 'i', Description = "Minimum value of elements.")]
@@ -28,7 +29,7 @@ namespace math_trainer
         [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
         public virtual int? MinAnswer { get; set; } = null;
 
-        [CommandOption("max_answer", 's', Description = "Maximum value of answer.")]
+        [CommandOption("max_answer", 'x', Description = "Maximum value of answer.")]
         public virtual int? MaxAnswer { get; set; } = null;
 
         public ValueTask ExecuteAsync(IConsole console)
@@ -57,6 +58,7 @@ namespace math_trainer
                             return true;
                         var answer = new Operation(a, Op, b).Solve();
                         return (
+                            // i like it ok
                             !(MaxAnswer == null && MinAnswer == null)
                             && !(MinAnswer == null && answer <= MaxAnswer)
                             && !(answer >= MinAnswer && MaxAnswer == null)
@@ -76,11 +78,13 @@ namespace math_trainer
 
         public virtual bool IsAnswerCorrect(decimal correct, decimal? user)
         {
-            var diff = correct - user;
             if (Margin == 0m)
                 return correct == user;
             else
+            {
+                var diff = correct - user;
                 return diff < Margin && diff > -Margin;
+            }
         }
 
         public void Practice()
@@ -90,7 +94,6 @@ namespace math_trainer
                 var equation = CreateEquation();
                 var answer = equation.Solve();
                 string question = equation.ToString();
-                //    $"[#CDD6F4]{(numA):0.##}[/][#FAB387] + [/][#CDD6F4]{(numB):0.##}[/]";
 
                 List<char> keysPressed = [];
 
@@ -103,12 +106,16 @@ namespace math_trainer
 
                     var press = System.Console.ReadKey(intercept: true);
 
-                    decimal userAnswer = 0;
+                    decimal userAnswer = decimal.MaxValue;
                     if (
                         Utils.Numbers.Contains(press.KeyChar)
-                        && Decimal.TryParse(
-                            new String([.. keysPressed]) + press.KeyChar,
-                            out userAnswer
+                        && (
+                            Decimal.TryParse(
+                                new String([.. keysPressed]) + press.KeyChar,
+                                CultureInfo.InvariantCulture,
+                                out userAnswer
+                            )
+                            || press.KeyChar == '-'
                         )
                     )
                         keysPressed.Add(press.KeyChar);

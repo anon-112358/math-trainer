@@ -11,15 +11,15 @@ namespace math_trainer.Equation
 
     public static class OperatorExtensions
     {
-        public static char ToSymbol(this Operator op)
+        public static string ToSymbol(this Operator op)
         {
             return op switch
             {
-                Operator.Times => '*',
-                Operator.DividedBy => '/',
-                Operator.Minus => '-',
-                Operator.Plus => '+',
-                _ => op.ToString().ToCharArray()[0],
+                Operator.Times => "*",
+                Operator.DividedBy => "/",
+                Operator.Minus => "-",
+                Operator.Plus => "+",
+                _ => op.ToString(),
             };
         }
 
