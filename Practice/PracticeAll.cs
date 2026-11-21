@@ -28,9 +28,9 @@ namespace math_trainer.Practice
         public bool IsRandom { get; set; } = false;
 
         private int index = 0;
-        private Dictionary<Type, AbstractPractice>? instances;
+        private AbstractPractice[]? instances;
 
-        Dictionary<Type, AbstractPractice> GetInstances()
+        AbstractPractice[] GetInstances()
         {
             AbstractPractice[] practiceInstances =
             [
@@ -39,10 +39,9 @@ namespace math_trainer.Practice
                 new MultiplicationPractice(),
                 new DivisionPractice(),
             ];
-            Dictionary<Type, AbstractPractice> product = [];
-            foreach (var iChosen in Enumerable.Range(0, practiceInstances.Length))
+            List<AbstractPractice> product = [];
+            foreach (var chosenIns in practiceInstances)
             {
-                var chosenIns = practiceInstances[iChosen];
                 var chosenType = chosenIns.GetType();
                 var thisProperties = this.GetType().GetProperties();
                 var chosenProperties = chosenType.GetProperties();
@@ -61,18 +60,16 @@ namespace math_trainer.Practice
 
                     prop.SetValue(chosenIns, thisProp.GetValue(this));
                 }
-                product.Add(chosenType, chosenIns);
+                product.Add(chosenIns);
             }
-            return product;
+            return [.. product];
         }
 
         public override Operation CreateEquation()
         {
             instances ??= GetInstances();
             return instances[
-                instances.Keys.ElementAt(
-                    (IsRandom ? Utils.GetNum(0, instances.Count) : index++ % 4)
-                )
+                IsRandom ? Utils.GetNum(0, instances.Length) : index++ % instances.Length
             ]
                 .CreateEquation();
         }
