@@ -123,7 +123,7 @@ namespace math_trainer.Practice
 
                     var press = System.Console.ReadKey(intercept: true);
 
-                    decimal userAnswer = decimal.MaxValue;
+                    decimal userAnswer = decimal.MaxValue / 2;
                     if (
                         Utils.Numbers.Contains(press.KeyChar)
                         && (
@@ -145,6 +145,11 @@ namespace math_trainer.Practice
                         && (press.KeyChar == 'Q' || press.KeyChar == 'q')
                     )
                         return;
+                    else if (
+                        press.Modifiers == ConsoleModifiers.None
+                        && (press.KeyChar == 'Q' || press.KeyChar == 'q')
+                    )
+                        break;
 
                     if (IsAnswerCorrect(answer, userAnswer))
                         break;
