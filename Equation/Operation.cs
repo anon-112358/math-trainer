@@ -21,19 +21,9 @@ namespace math_trainer.Equation
             var StrB = B.ToString();
             var StrOp = Op.ToSymbol();
 
-            if (B < 0 && Op == Operator.Minus)
-            {
-                StrB = Math.Abs(B).ToString();
-                StrOp = Operator.Plus.ToSymbol();
-            }
-            else if (B < 0 && (Op == Operator.DividedBy || Op == Operator.Times))
+            if (B < 0)
             {
                 StrB = $"({StrB})";
-            }
-            else if (B < 0 && (Op == Operator.Plus))
-            {
-                StrB = Math.Abs(B).ToString();
-                StrOp = Operator.Minus.ToSymbol();
             }
 
             return $"[{Constants.NumMarkupColor}]{StrA}[/] "

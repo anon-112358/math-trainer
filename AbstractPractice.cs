@@ -26,6 +26,22 @@ namespace math_trainer
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
         public abstract int MaxVal { get; set; }
 
+        // todo implement
+        [CommandOption("minA", 'f', Description = "Minimum value of elements.")]
+        public virtual int MinA { get; set; }
+
+        // todo implement
+        [CommandOption("maxA", 'g', Description = "Maximum value of elements.")]
+        public virtual int MaxA { get; set; }
+
+        // todo implement
+        [CommandOption("minB", 'h', Description = "Minimum value of elements.")]
+        public virtual int MinB { get; set; }
+
+        // todo implement
+        [CommandOption("maxB", 'l', Description = "Maximum value of elements.")]
+        public virtual int MaxB { get; set; }
+
         [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
         public virtual int? MinAnswer { get; set; } = null;
 

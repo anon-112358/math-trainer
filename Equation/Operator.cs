@@ -23,6 +23,18 @@ namespace math_trainer.Equation
             };
         }
 
+        public static Operator ToOpposite(this Operator op)
+        {
+            return op switch
+            {
+                Operator.Times => Operator.DividedBy,
+                Operator.DividedBy => Operator.DividedBy,
+                Operator.Minus => Operator.Plus,
+                Operator.Plus => Operator.Minus,
+                _ => throw new Exception(),
+            };
+        }
+
         public static string ToColor(this Operator op)
         {
             return op switch
