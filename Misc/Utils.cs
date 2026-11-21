@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 
 namespace math_trainer.Misc
@@ -114,5 +115,30 @@ namespace math_trainer.Misc
             '.',
             '-',
         ];
+
+        public class DatabaseContext : DbContext
+        {
+            public DbSet<Config.ConfigData> ConfigData { get; set; }
+
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                var localApplication = Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData
+                );
+                var home = Path.Combine(localApplication, "math-trainer");
+                var data = Path.Combine(home, "db.db");
+
+                Directory.CreateDirectory(home);
+
+                optionsBuilder.UseSqlite($"Data Source={data}");
+            }
+
+            public static DatabaseContext SetupDb()
+            {
+                var db = new DatabaseContext();
+                db.Database.EnsureCreated();
+                return db;
+            }
+        }
     }
 }

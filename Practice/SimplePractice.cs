@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using CliFx.Binding;
 using math_trainer.Equation;
 using math_trainer.Misc;

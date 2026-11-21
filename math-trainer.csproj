@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="CliFx" Version="3.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="11.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.57.2" />
   </ItemGroup>
 </Project>
