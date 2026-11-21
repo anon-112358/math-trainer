@@ -10,19 +10,16 @@ namespace math_trainer
         public partial class AdditionPractice : AbstractPractice
         {
             public override Operator Op { get; } = Operator.Plus;
+            public override int MinVal { get; set; } = -10;
+            public override int MaxVal { get; set; } = 50;
         }
 
         [Command("sub", Description = "Practice subtraction.")]
         public partial class SubtractionPractice : AbstractPractice
         {
             public override Operator Op { get; } = Operator.Minus;
-
-            public override Operation CreateEquation()
-            {
-                var b = Utils.GetNum(MinVal, MaxVal + 1);
-                b = b < 0 ? 0 : b;
-                return new Operation(Utils.GetNum(MinVal, MaxVal + 1), Op, b);
-            }
+            public override int MinVal { get; set; } = -50;
+            public override int MaxVal { get; set; } = 99;
         }
 
         [Command("mul", Description = "Practice multiplication.")]
@@ -30,6 +27,8 @@ namespace math_trainer
         {
             public override Operator Op { get; } = Operator.Times;
             public override decimal Margin { get; set; } = 0.05m;
+            public override int MinVal { get; set; } = -20;
+            public override int MaxVal { get; set; } = 50;
         }
 
         [Command("div", Description = "Practice divisions.")]
@@ -37,6 +36,8 @@ namespace math_trainer
         {
             public override Operator Op { get; } = Operator.DividedBy;
             public override decimal Margin { get; set; } = 0.05m;
+            public override int MinVal { get; set; } = 0;
+            public override int MaxVal { get; set; } = 100;
             readonly decimal[] trivialAnswers = [0m, 1m, -1m];
 
             [CommandOption("divisible", 'v', Description = "Allow non-divisible pairs of numbers.")]
@@ -75,7 +76,7 @@ namespace math_trainer
                 var _condition = Condition;
                 Condition = (a, b) => _condition(a, b) || ConstrainCondition(a, b);
 
-                var (a, b) = Utils.FindNumberWithCondition(
+                var (a, b) = Utils.FindNumbersThatAreFalse(
                     Condition,
                     () => Utils.GetNum(MinVal, MaxVal + 1)
                 );

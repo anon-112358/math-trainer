@@ -15,42 +15,7 @@ namespace math_trainer.Equation
 
         public decimal Solve()
         {
-            if (Left.IsOperation() && Right.IsOperation())
-            {
-                return new Operation(
-                    Left.GetOperation().Solve(),
-                    ChildrenRelation,
-                    Right.GetOperation().Solve()
-                ).Solve();
-            }
-            else if (!Left.IsOperation() && !Right.IsOperation())
-            {
-                return new Operation(
-                    (Left.GetBranch().Solve()),
-                    ChildrenRelation,
-                    Right.GetBranch().Solve()
-                ).Solve();
-            }
-            else if (Left.IsOperation() && !Right.IsOperation())
-            {
-                return new Operation(
-                    Left.GetOperation().Solve(),
-                    ChildrenRelation,
-                    Right.GetBranch().Solve()
-                ).Solve();
-            }
-            else if (!Left.IsOperation() && Right.IsOperation())
-            {
-                return new Operation(
-                    Left.GetBranch().Solve(),
-                    ChildrenRelation,
-                    Right.GetOperation().Solve()
-                ).Solve();
-            }
-            else
-            {
-                throw new Exception();
-            }
+            return new Operation(Left.Solve(), ChildrenRelation, Right.Solve()).Solve();
         }
 
         EquationBinaryBranch INode.GetBranch()

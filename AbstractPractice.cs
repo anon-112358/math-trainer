@@ -12,23 +12,23 @@ namespace math_trainer
         [CommandOption("questions", 'q', Description = "Number of questions.")]
         public virtual int? NumQ { get; set; } = null;
 
+        [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
+        public virtual bool IsDoubles { get; set; } = false;
+
+        [CommandOption("margin", 'm', Description = "Allowed margin of error.")]
+        public virtual decimal Margin { get; set; } = 0m;
+
         [CommandOption("min", 'i', Description = "Minimum value of elements.")]
-        public virtual int MinVal { get; set; } = -10;
+        public abstract int MinVal { get; set; }
 
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
-        public virtual int MaxVal { get; set; } = 30;
+        public abstract int MaxVal { get; set; }
 
         [CommandOption("min_answer", 'n', Description = "Minimum value of answer.")]
         public virtual int? MinAnswer { get; set; } = null;
 
         [CommandOption("max_answer", 's', Description = "Maximum value of answer.")]
         public virtual int? MaxAnswer { get; set; } = null;
-
-        [CommandOption("decimals", 'd', Description = "Whether or not to include decimals.")]
-        public virtual bool IsDoubles { get; set; } = false;
-
-        [CommandOption("margin", 'm', Description = "Allowed margin of error.")]
-        public virtual decimal Margin { get; set; } = 0m;
 
         public ValueTask ExecuteAsync(IConsole console)
         {
@@ -49,18 +49,29 @@ namespace math_trainer
             if (MinAnswer == null && MaxAnswer == null)
                 return new(Utils.GetNum(MinVal, MaxVal + 1), Utils.GetNum(MinVal, MaxVal + 1));
             else
-                return Utils.FindNumberWithCondition(
-                    (a, b) =>
+                return Utils.FindNumbersThatAreFalse(
+                    boolFactory: (a, b) =>
                     {
                         var answer = new Operation(a, Op, b).Solve();
-                        var result = MaxAnswer == null || MaxAnswer >= answer;
-                        return result && (MinAnswer == null || MinAnswer <= answer);
+                        return (
+                            !(MaxAnswer == null && MinAnswer == null)
+                            && !(MinAnswer == null && answer <= MaxAnswer)
+                            && !(answer >= MinAnswer && MaxAnswer == null)
+                            && !(answer >= MinAnswer && answer <= MaxAnswer)
+                            && (
+                                (MinAnswer == null && answer > MaxAnswer)
+                                || (answer >= MinAnswer && answer > MaxAnswer)
+                                || (answer < MinAnswer && MaxAnswer == null)
+                                || (answer < MinAnswer && answer <= MaxAnswer)
+                                || (answer < MinAnswer && answer > MaxAnswer)
+                            )
+                        );
                     },
-                    () => Utils.GetNum(MinVal, MaxVal + 1)
+                    decimalFactory: () => Utils.GetNum(MinVal, MaxVal + 1)
                 );
         }
 
-        public virtual bool IsAnswerCorrect(decimal correct, decimal user)
+        public virtual bool IsAnswerCorrect(decimal correct, decimal? user)
         {
             var diff = correct - user;
             if (Margin == 0m)
@@ -87,14 +98,19 @@ namespace math_trainer
                     MarkupLine(question + '\n');
                     AnsiConsole.Write(String.Join("", keysPressed));
 
-                    var press = System.Console.ReadKey().KeyChar;
+                    var press = System.Console.ReadKey();
 
-                    if (Utils.Numbers.Contains(press))
-                        keysPressed.Add(press);
-                    else if (press == '\b' && keysPressed.Count > 0)
+                    if (Utils.Numbers.Contains(press.KeyChar))
+                        keysPressed.Add(press.KeyChar);
+                    else if (press.KeyChar == '\b' && keysPressed.Count > 0)
                     {
                         keysPressed.RemoveAt(keysPressed.Count - 1);
                     }
+                    else if (
+                        press.Modifiers == ConsoleModifiers.Shift
+                        && (press.KeyChar == 'Q' || press.KeyChar == 'q')
+                    )
+                        return;
 
                     decimal? userAnswer = null;
 
@@ -104,7 +120,7 @@ namespace math_trainer
                     }
                     catch { }
 
-                    if (answer == userAnswer)
+                    if (IsAnswerCorrect(answer, userAnswer))
                         break;
                 }
             }

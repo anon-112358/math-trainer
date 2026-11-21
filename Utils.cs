@@ -84,15 +84,15 @@ namespace math_trainer
             }
         }
 
-        public static Tuple<decimal, decimal> FindNumberWithCondition(
+        public static Tuple<decimal, decimal> FindNumbersThatAreFalse(
             Func<decimal, decimal, bool> boolFactory,
             Func<decimal> decimalFactory
         )
         {
             var tryCount = 0;
 
-            var a = 0m;
-            var b = 0m;
+            var a = decimalFactory();
+            var b = decimalFactory();
 
             while (boolFactory(a, b))
             {
