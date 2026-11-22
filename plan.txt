@@ -13,3 +13,4 @@ add question log and try to avoid repeating questions from that info
 add thingy saying that its shift q to exit, probably on base command?
 make configcommand not require you to specify the full name
 make PracticeAll support config
+--gen flag on abstractpractice where you just ask it to generate x questions instead of being interactive
