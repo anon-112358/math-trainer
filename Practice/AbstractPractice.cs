@@ -154,10 +154,7 @@ namespace math_trainer.Practice
                     {
                         if (press.Modifiers == ConsoleModifiers.Shift)
                             return;
-                        else if (
-                            press.Modifiers == ConsoleModifiers.None
-                            && (press.KeyChar == 'Q' || press.KeyChar == 'q')
-                        )
+                        else if (press.Modifiers == ConsoleModifiers.None)
                             break;
                     }
                     if (isSuccess && IsAnswerCorrect(answer, userAnswer))

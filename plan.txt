@@ -1,6 +1,7 @@
 todo
 
 text is green for a second after you get it right
+delay setting (uint? needs configcommand parse implementation)
 equation mode
 equation settings
 logging scores; improvement
@@ -14,3 +15,8 @@ add thingy saying that its shift q to exit, probably on base command?
 make configcommand not require you to specify the full name
 make PracticeAll support config
 --gen flag on abstractpractice where you just ask it to generate x questions instead of being interactive
+fix AbstractPractice.ConstrainAnswer() if/else not implementing correct logic on true
+fix config set default not working
+add IsDoubles support to division's CreateEquation()
+maybe separate state classes from logic classes and fix tech debt
+make --decimals number gen be maxed to 2 digits
