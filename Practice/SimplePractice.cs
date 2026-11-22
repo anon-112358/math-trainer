@@ -79,10 +79,11 @@ namespace math_trainer.Practice
                 'd',
                 Description = "Allow non-divisible pairs of numbers."
             )]
-            public bool AreUndivisiblesAllowed { get; set; } = false;
+            public bool AreUndivisiblesAllowed { get; set; } = Data.DivisionAreUndivisiblesAllowed;
 
             [CommandOption("trivial", 't', Description = "Allow trivial answers.")]
-            public bool AreTrivialNumbersAllowed { get; set; } = false;
+            public bool AreTrivialNumbersAllowed { get; set; } =
+                Data.DivisionAreTrivialNumbersAllowed;
 
             public override Operation CreateEquation()
             {
