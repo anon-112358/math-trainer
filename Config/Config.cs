@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace math_trainer.Config
 {
     [Command("config", Description = "Change program settings.")]
-    public partial class Config : ICommand
+    public partial class ConfigCommand : ICommand
     {
         public static ConfigData Data { get; set; } = Load();
 
@@ -55,7 +55,10 @@ namespace math_trainer.Config
                 if (prop == null || !prop.IsDefined(typeof(Utils.SettingAttribute), true))
                     throw new CommandException(
                         "Invalid option. Valid options:\n"
-                            + ConfigList.GetFormattedSettings(withStart: false, withValues: false)
+                            + ConfigList.GetFormattedSettings(
+                                withExtraStuff: false,
+                                withValues: false
+                            )
                     );
 
                 object? converted;
@@ -65,9 +68,19 @@ namespace math_trainer.Config
                 }
                 catch
                 {
-                    throw new CommandException(
-                        $"Invalid value for '{KeyToChange}'. Correct type: {prop.PropertyType.Name}"
-                    );
+                    if (
+                        String.Equals(
+                            ValToChange.ToLower(),
+                            "null",
+                            StringComparison.InvariantCultureIgnoreCase
+                        ) && Utils.IsNullable(prop.PropertyType)
+                    )
+                        converted = null;
+                    else
+                        throw new CommandException(
+                            $"Invalid value for '{KeyToChange}'. Correct type:"
+                                + $" {(Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType).Name}"
+                        );
                 }
 
                 prop.SetValue(Data, converted);
@@ -92,28 +105,48 @@ namespace math_trainer.Config
         [Command("config list", Description = "List settings.")]
         public partial class ConfigList : ICommand
         {
+            [CommandOption(
+                "search",
+                's',
+                Description = "Only include entries that include the input to this."
+            )]
+            public string UserQuery { get; set; } = "";
+
             public ValueTask ExecuteAsync(IConsole _)
             {
                 Console.WriteLine(GetFormattedSettings());
                 return default;
             }
 
-            public static string GetFormattedSettings(bool withStart = true, bool withValues = true)
+            public static string GetFormattedSettings(
+                bool withExtraStuff = true,
+                bool withValues = true,
+                string query = ""
+            )
             {
                 var data = Data;
                 var dataType = data.GetType();
                 var builder = new StringBuilder();
 
-                if (withStart)
+                if (withExtraStuff)
                     builder.AppendLine("Values:");
 
                 foreach (var prop in dataType.GetProperties())
                 {
-                    if (prop.IsDefined(typeof(Utils.SettingAttribute), true))
+                    if (
+                        prop.IsDefined(typeof(Utils.SettingAttribute), true)
+                        && (query == "" || prop.Name.Contains(query))
+                    )
                         builder.AppendLine(
-                            $"  - {prop.Name}" + (withValues ? $": {prop.GetValue(data)}" : "")
+                            $"  - {prop.Name}"
+                                + (Utils.IsNullable(prop.PropertyType) ? " (nullable)" : "")
+                                + (withValues ? $": {prop.GetValue(data)}" : "")
                         );
                 }
+                if (withExtraStuff)
+                    builder.AppendLine(
+                        "Tip: You can set nullable values to null by typing null into the value field."
+                    );
 
                 return builder.ToString();
             }
