@@ -83,6 +83,8 @@ namespace math_trainer.Practice
                     {
                         if (Op == Operator.DividedBy && b == 0)
                             return true;
+                        if (a < MinA || b < MinB || a > MaxA || b > MaxB)
+                            return true;
                         var answer = new Operation(
                             a,
                             Op ?? throw new InvalidDataException(),
@@ -103,7 +105,9 @@ namespace math_trainer.Practice
                             )
                         );
                     },
-                    decimalFactory: () => Utils.GetNum(min, max + 1)
+                    decimalFactory: () =>
+                        Utils.GetNum(min, max + 1)
+                        + (IsDoubles ? (decimal)Utils.Gen.NextDouble() : 0m)
                 );
         }
 

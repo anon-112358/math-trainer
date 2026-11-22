@@ -5,7 +5,7 @@ namespace math_trainer.Misc
 {
     public static class Utils
     {
-        private static readonly Random Gen = new();
+        public static readonly Random Gen = new();
         private static string TopRightStr = "";
 
         public static int GetNum(int min, int max)

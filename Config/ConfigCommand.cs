@@ -13,8 +13,8 @@ namespace math_trainer.Config
     [Command("config", Description = "Change program settings.")]
     public partial class ConfigCommand : ICommand
     {
-        private static Lazy<ConfigData> _data { get; set; } = new(Load());
-        public static ConfigData Data { get; set; } = _data.Value;
+        private static Lazy<ConfigData> _data { get; set; } = new(Load);
+        public static ConfigData Data => _data.Value;
 
         private static ConfigData Load()
         {
@@ -39,59 +39,75 @@ namespace math_trainer.Config
         [Command("config set", Description = "Set a setting.")]
         public partial class Set : ICommand
         {
-            [CommandParameter(0, Name = "Key", Description = "Setting to change")]
-            public required string KeyToChange { get; set; }
-
-            [CommandParameter(1, Name = "Value", Description = "Value to assign to key")]
-            public required string ValToChange { get; set; }
+            [CommandParameter(
+                0,
+                Name = "Key-Value pairs",
+                Description = "Setting to change, then value to change"
+                    + " it to, repeating as many times as needed."
+            )]
+            public required string[] KVPs { get; set; }
 
             public ValueTask ExecuteAsync(IConsole _)
             {
-                var prop = Data.GetType()
-                    .GetProperty(
-                        KeyToChange,
-                        BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
-                    );
+                if (KVPs.Length % 2 != 0)
+                    throw new CommandException("Non-even number of arguments.");
 
-                if (prop == null || !prop.IsDefined(typeof(Utils.SettingAttribute), true))
-                    throw new CommandException(
-                        "Invalid option. Valid options:\n"
-                            + ConfigList.GetFormattedSettings(
-                                withExtraStuff: false,
-                                withValues: false
-                            )
-                    );
+                List<string> keys = [];
+                List<string> values = [];
 
-                object? converted = InputConverter(ValToChange, prop.PropertyType);
-                bool isStringNull = false;
-
-                if (
-                    String.Equals(
-                        ValToChange.ToLower(),
-                        "null",
-                        StringComparison.InvariantCultureIgnoreCase
-                    ) && Utils.IsNullable(prop.PropertyType)
-                )
+                for (int i = 0; i < KVPs.Length; i++)
                 {
-                    isStringNull = true;
-                    converted = null;
+                    if (i % 2 != 0)
+                        values.Add(KVPs[i]);
+                    else
+                        keys.Add(KVPs[i]);
                 }
 
-                if (converted == null && !isStringNull)
-                    throw new CommandException(
-                        $"Invalid value for '{KeyToChange}'. Correct type:"
-                            + $" {(Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType).Name}"
-                    );
-
-                prop.SetValue(Data, converted);
-
                 using var db = Utils.DatabaseContext.SetupDb();
+
+                foreach (var (key, val) in keys.Zip(values))
+                {
+                    var prop = Data.GetType()
+                        .GetProperty(
+                            key,
+                            BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
+                        );
+
+                    if (prop == null || !prop.IsDefined(typeof(Utils.SettingAttribute), true))
+                        throw new CommandException(
+                            $"Invalid option '{key}'. Valid options:\n"
+                                + ConfigList.GetFormattedSettings(
+                                    withExtraStuff: false,
+                                    withValues: false
+                                )
+                        );
+
+                    object? converted = InputConverter(val, prop.PropertyType);
+                    bool isStringNull = false;
+
+                    if (
+                        String.Equals(
+                            val.ToLower(),
+                            "null",
+                            StringComparison.InvariantCultureIgnoreCase
+                        ) && Utils.IsNullable(prop.PropertyType)
+                    )
+                    {
+                        isStringNull = true;
+                        converted = null;
+                    }
+
+                    if (converted == null && !isStringNull)
+                        throw new CommandException(
+                            $"Invalid value for '{key}'. Correct type:"
+                                + $" {(Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType).Name}"
+                        );
+
+                    prop.SetValue(Data, converted);
+                    Console.WriteLine($"Successfully changed '{key}' to '{val}'.");
+                }
                 db.Update(Data);
-
                 db.SaveChanges();
-
-                Console.WriteLine($"Successfully changed '{KeyToChange}' to '{ValToChange}'.");
-
                 return default;
             }
         }
