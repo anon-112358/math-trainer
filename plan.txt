@@ -1,16 +1,15 @@
-
 todo
 
 text is green for a second after you get it right
-give up key
-fix issue where you get "x + -y" (probably in Operation.ToString())
 equation mode
 equation settings
-generation
 logging scores; improvement
 logging folder
 log to sqlite
-research how to gen equations gooder. Maybe pull from some database of solved equations step by step?
+output short-stats of session after exiting buffer
+config to disable logging
+command to reset stats
 add question log and try to avoid repeating questions from that info
-add mode where all types may show up
-add thingy saying shift q to exit on base command
+add thingy saying that its shift q to exit, probably on base command?
+make configcommand not require you to specify the full name
+make PracticeAll support config

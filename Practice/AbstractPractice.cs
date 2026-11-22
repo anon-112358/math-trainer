@@ -20,7 +20,6 @@ namespace math_trainer.Practice
         [CommandOption("questions", 'q', Description = "Number of questions.")]
         public virtual int? NumQ { get; set; } = null;
 
-        // todo implement
         [CommandOption("decimals", 'c', Description = "Whether or not to include decimals.")]
         public virtual bool IsDoubles { get; set; } = false;
 
@@ -33,19 +32,15 @@ namespace math_trainer.Practice
         [CommandOption("max", 'a', Description = "Maximum value of elements.")]
         public abstract int? MaxVal { get; set; }
 
-        // todo implement
         [CommandOption("minA", 'f', Description = "Minimum value of the first element.")]
         public virtual int? MinA { get; set; } = null;
 
-        // todo implement
         [CommandOption("maxA", 'g', Description = "Maximum value of the first element.")]
         public virtual int? MaxA { get; set; } = null;
 
-        // todo implement
         [CommandOption("minB", 'l', Description = "Minimum value of the second element.")]
         public virtual int? MinB { get; set; } = null;
 
-        // todo implement
         [CommandOption("maxB", 'm', Description = "Maximum value of the second element.")]
         public virtual int? MaxB { get; set; } = null;
 
@@ -155,17 +150,16 @@ namespace math_trainer.Practice
                     {
                         keysPressed.RemoveAt(keysPressed.Count - 1);
                     }
-                    else if (
-                        press.Modifiers == ConsoleModifiers.Shift
-                        && (press.KeyChar == 'Q' || press.KeyChar == 'q')
-                    )
-                        return;
-                    else if (
-                        press.Modifiers == ConsoleModifiers.None
-                        && (press.KeyChar == 'Q' || press.KeyChar == 'q')
-                    )
-                        break;
-
+                    else if ((press.KeyChar == 'Q' || press.KeyChar == 'q'))
+                    {
+                        if (press.Modifiers == ConsoleModifiers.Shift)
+                            return;
+                        else if (
+                            press.Modifiers == ConsoleModifiers.None
+                            && (press.KeyChar == 'Q' || press.KeyChar == 'q')
+                        )
+                            break;
+                    }
                     if (isSuccess && IsAnswerCorrect(answer, userAnswer))
                         break;
                 }

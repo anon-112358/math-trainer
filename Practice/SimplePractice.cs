@@ -86,25 +86,22 @@ namespace math_trainer.Practice
 
             public override Operation CreateEquation()
             {
-                if (AreUndivisiblesAllowed)
-                    return base.CreateEquation();
-
                 if (MinVal == null || MaxVal == null)
                     throw new InvalidDataException();
 
                 int min = (int)MinVal;
                 int max = (int)MaxVal;
 
-                bool baseCondition(decimal a, decimal b) => (b == 0m || a % b != 0m);
+                bool divisibilityCondition(decimal a, decimal b) => (b == 0m || a % b != 0m);
 
-                bool nonTrivialCondition(decimal a, decimal b)
+                bool nonTrivialityCondition(decimal a, decimal b)
                 {
                     decimal[] trivialAnswers = [a, -a, 0m, 1m, -1m];
                     var answer = a / (b == 0 ? 1 : b);
-                    return baseCondition(a, b) || trivialAnswers.Contains(answer);
+                    return trivialAnswers.Contains(answer);
                 }
 
-                bool ConstrainCondition(decimal a, decimal b)
+                bool rangeCondition(decimal a, decimal b)
                 {
                     var answer = new Operation(
                         a,
@@ -116,16 +113,13 @@ namespace math_trainer.Practice
                         return true;
                     return !(result && (MinAnswer == null || MinAnswer <= answer));
                 }
-
-                Func<decimal, decimal, bool> Condition = AreTrivialNumbersAllowed
-                    ? baseCondition
-                    : nonTrivialCondition;
-
-                var _condition = Condition;
-                Condition = (a, b) => _condition(a, b) || ConstrainCondition(a, b);
+                bool combinedCondition(decimal a, decimal b) =>
+                    (!AreUndivisiblesAllowed && divisibilityCondition(a, b))
+                    || (!AreTrivialNumbersAllowed && nonTrivialityCondition(a, b))
+                    || rangeCondition(a, b);
 
                 var (a, b) = Utils.FindNumbersThatAreFalse(
-                    Condition,
+                    combinedCondition,
                     () => Utils.GetNum(min, max + 1)
                 );
 

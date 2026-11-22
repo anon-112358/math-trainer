@@ -39,9 +39,21 @@ namespace math_trainer.Config
         [Command("config set", Description = "Set a setting.")]
         public partial class Set : ICommand
         {
+            [Command("config set default", Description = "Set settings to default.")]
+            public partial class Default : ICommand
+            {
+                public ValueTask ExecuteAsync(IConsole _)
+                {
+                    using var db = Utils.DatabaseContext.SetupDb();
+                    db.Update(new ConfigData());
+                    db.SaveChanges();
+                    return default;
+                }
+            }
+
             [CommandParameter(
                 0,
-                Name = "Key-Value pairs",
+                Name = "Key-Value-Pairs",
                 Description = "Setting to change, then value to change"
                     + " it to, repeating as many times as needed."
             )]
