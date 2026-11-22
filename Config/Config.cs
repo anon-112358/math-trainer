@@ -1,4 +1,4 @@
-#pragma warning disable EF1002
+#pragma warning disable EF1002, IDE1006
 
 using System.Reflection;
 using System.Text;
@@ -13,7 +13,8 @@ namespace math_trainer.Config
     [Command("config", Description = "Change program settings.")]
     public partial class ConfigCommand : ICommand
     {
-        public static ConfigData Data { get; set; } = Load();
+        private static Lazy<ConfigData> _data { get; set; } = new(Load());
+        public static ConfigData Data { get; set; } = _data.Value;
 
         private static ConfigData Load()
         {
@@ -85,8 +86,7 @@ namespace math_trainer.Config
                 prop.SetValue(Data, converted);
 
                 using var db = Utils.DatabaseContext.SetupDb();
-                db.ConfigData.RemoveRange(db.ConfigData);
-                db.Add(Data);
+                db.Update(Data);
 
                 db.SaveChanges();
 
@@ -110,21 +110,28 @@ namespace math_trainer.Config
             string[] trueyStrings = ["yes", "y", "true", "t", "1", "on", "enable", "enabled"];
             string[] falseyStrings = ["no", "n", "false", "f", "0", "off", "disable", "disabled"];
 
-            input = input.Trim().ToLower();
+            var toCheck = input.Trim().ToLower();
 
-            if (numberTypes.Contains(outputType))
+            try
             {
-                Type numType = Nullable.GetUnderlyingType(outputType) ?? outputType;
-                return Convert.ChangeType(input, numType);
+                if (numberTypes.Contains(outputType))
+                {
+                    Type numType = Nullable.GetUnderlyingType(outputType) ?? outputType;
+                    return Convert.ChangeType(input, numType);
+                }
+                else if (outputType == typeof(bool) || outputType == typeof(Nullable<bool>))
+                    return trueyStrings.Contains(toCheck) ? true
+                        : falseyStrings.Contains(toCheck) ? false
+                        : null;
+                else if (safeTypes.Contains(outputType))
+                    return Convert.ChangeType(input, outputType);
+                else
+                    return null;
             }
-            else if (outputType == typeof(bool))
-                return trueyStrings.Contains(input) ? true
-                    : falseyStrings.Contains(input) ? false
-                    : null;
-            else if (safeTypes.Contains(outputType))
-                return Convert.ChangeType(input, outputType);
-            else
+            catch (Exception ex) when (ex is FormatException or OverflowException)
+            {
                 return null;
+            }
         }
 
         public ValueTask ExecuteAsync(IConsole _)
@@ -165,7 +172,10 @@ namespace math_trainer.Config
                 {
                     if (
                         prop.IsDefined(typeof(Utils.SettingAttribute), true)
-                        && (query == "" || prop.Name.Contains(query))
+                        && (
+                            query == ""
+                            || prop.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+                        )
                     )
                         builder.AppendLine(
                             $"  - {prop.Name}"
