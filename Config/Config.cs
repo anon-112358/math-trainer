@@ -61,27 +61,26 @@ namespace math_trainer.Config
                             )
                     );
 
-                object? converted;
-                try
+                object? converted = InputConverter(ValToChange, prop.PropertyType);
+                bool isStringNull = false;
+
+                if (
+                    String.Equals(
+                        ValToChange.ToLower(),
+                        "null",
+                        StringComparison.InvariantCultureIgnoreCase
+                    ) && Utils.IsNullable(prop.PropertyType)
+                )
                 {
-                    converted = Convert.ChangeType(ValToChange, prop.PropertyType);
+                    isStringNull = true;
+                    converted = null;
                 }
-                catch
-                {
-                    if (
-                        String.Equals(
-                            ValToChange.ToLower(),
-                            "null",
-                            StringComparison.InvariantCultureIgnoreCase
-                        ) && Utils.IsNullable(prop.PropertyType)
-                    )
-                        converted = null;
-                    else
-                        throw new CommandException(
-                            $"Invalid value for '{KeyToChange}'. Correct type:"
-                                + $" {(Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType).Name}"
-                        );
-                }
+
+                if (converted == null && !isStringNull)
+                    throw new CommandException(
+                        $"Invalid value for '{KeyToChange}'. Correct type:"
+                            + $" {(Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType).Name}"
+                    );
 
                 prop.SetValue(Data, converted);
 
@@ -95,6 +94,37 @@ namespace math_trainer.Config
 
                 return default;
             }
+        }
+
+        private static object? InputConverter(string input, Type outputType)
+        {
+            Type[] numberTypes =
+            [
+                typeof(int),
+                typeof(Nullable<int>),
+                typeof(decimal),
+                typeof(Nullable<decimal>),
+            ];
+            Type[] safeTypes = [typeof(String)];
+
+            string[] trueyStrings = ["yes", "y", "true", "t", "1", "on", "enable", "enabled"];
+            string[] falseyStrings = ["no", "n", "false", "f", "0", "off", "disable", "disabled"];
+
+            input = input.Trim().ToLower();
+
+            if (numberTypes.Contains(outputType))
+            {
+                Type numType = Nullable.GetUnderlyingType(outputType) ?? outputType;
+                return Convert.ChangeType(input, numType);
+            }
+            else if (outputType == typeof(bool))
+                return trueyStrings.Contains(input) ? true
+                    : falseyStrings.Contains(input) ? false
+                    : null;
+            else if (safeTypes.Contains(outputType))
+                return Convert.ChangeType(input, outputType);
+            else
+                return null;
         }
 
         public ValueTask ExecuteAsync(IConsole _)
@@ -114,7 +144,7 @@ namespace math_trainer.Config
 
             public ValueTask ExecuteAsync(IConsole _)
             {
-                Console.WriteLine(GetFormattedSettings());
+                Console.WriteLine(GetFormattedSettings(query: UserQuery));
                 return default;
             }
 
@@ -140,7 +170,7 @@ namespace math_trainer.Config
                         builder.AppendLine(
                             $"  - {prop.Name}"
                                 + (Utils.IsNullable(prop.PropertyType) ? " (nullable)" : "")
-                                + (withValues ? $": {prop.GetValue(data)}" : "")
+                                + (withValues ? $": {prop.GetValue(data) ?? "null"}" : "")
                         );
                 }
                 if (withExtraStuff)
